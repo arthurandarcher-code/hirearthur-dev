@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireArthur — AI-Powered SaaS Builder & Automation Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-hover: #1a1a28;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #8888a0;
+    --accent: #00d4aa;
+    --accent-glow: rgba(0, 212, 170, 0.15);
+    --accent2: #6366f1;
+    --accent2-glow: rgba(99, 102, 241, 0.15);
+    --gradient: linear-gradient(135deg, #00d4aa, #6366f1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Grid background */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1.25rem 2rem;
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.5px;
+  }
+  .logo span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  nav a:hover { color: var(--accent); }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-cta {
+    background: var(--gradient) !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    color: #0a0a0f !important;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 5rem;
+    position: relative;
+  }
+  .hero-content { max-width: 800px; }
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero h1 .gradient {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn-primary {
+    background: var(--gradient);
+    color: #000000;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.3s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);
+  }
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  /* Floating orb */
+  .orb {
+    position: absolute;
+    right: -5%;
+    top: 20%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(0,212,170,0.12), rgba(99,102,241,0.08) 50%, transparent 70%);
+    filter: blur(60px);
+    animation: float 8s ease-in-out infinite;
+  }
+
+  /* STATS BAR */
+  .stats {
+    padding: 3rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.25rem;
+  }
+
+  /* SECTIONS */
+  section { padding: 6rem 0; }
+  .section-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 1rem;
+  }
+  .section-desc {
+    color: var(--text-dim);
+    max-width: 600px;
+    font-size: 1.05rem;
+    margin-bottom: 3rem;
+  }
+
+  /* SERVICES */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .service-card:hover {
+    border-color: rgba(0, 212, 170, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  .service-card:hover::before { opacity: 1; }
+  .service-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    background: var(--accent-glow);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+  }
+  .service-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .service-card p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .service-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* PROJECTS */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 1.5rem;
+  }
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s;
+  }
+  .project-card:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  .project-preview {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-preview .mesh {
+    position: absolute;
+    inset: 0;
+  }
+  .mesh-1 { background: linear-gradient(135deg, #0d3b2e 0%, #1a1040 50%, #0a2040 100%); }
+  .mesh-2 { background: linear-gradient(135deg, #2d1040 0%, #0a1a3b 50%, #1a3020 100%); }
+  .mesh-3 { background: linear-gradient(135deg, #1a2040 0%, #0d2b3b 50%, #2d2010 100%); }
+  .mesh-4 { background: linear-gradient(135deg, #0a2530 0%, #201040 50%, #2d1520 100%); }
+  .mesh-5 { background: linear-gradient(135deg, #10203b 0%, #2d1030 50%, #0a2520 100%); }
+  .project-type {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid rgba(0,212,170,0.2);
+  }
+  .project-body { padding: 1.5rem; }
+  .project-body h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .project-body p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .project-tags span {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* TECH */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .tech-group h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .tech-group ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .tech-group li {
+    font-size: 0.9rem;
+    color: var(--text);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  /* PROCESS */
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    counter-reset: step;
+  }
+  .step {
+    position: relative;
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: 'Space Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.3;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+  }
+  .step h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .step p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 8rem 0;
+    position: relative;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,170,0.06), rgba(99,102,241,0.04) 50%, transparent 70%);
+    filter: blur(60px);
+  }
+  .cta-section .section-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+  }
+  .cta-section .section-desc {
+    margin: 1rem auto 2.5rem;
+    max-width: 500px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, 20px); }
+  }
+
+  .fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fade-in.pre-animate {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .nav-links a:not(.nav-cta) { display: none; }
+    .services-grid, .projects-grid { grid-template-columns: 1fr; }
+    .hero h1 { letter-spacing: -1px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="inner">
+    <div class="logo">Hire<span>Arthur</span></div>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#contact" class="nav-cta">Let's Talk</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag">Available for projects</div>
+      <h1>I build <span class="gradient">AI-powered</span> tools that run themselves.</h1>
+      <p>Full-stack SaaS builder and automation architect. I design, build, and ship production systems that use AI to eliminate manual work — from autonomous content pipelines to self-healing investigation platforms.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-primary">Start a Project →</a>
+        <a href="#work" class="btn-secondary">View My Work</a>
+      </div>
+    </div>
+    <div class="orb"></div>
+  </div>
+</section>
+
+<div class="stats container fade-in">
+  <div class="stats-grid">
+    <div>
+      <div class="stat-num">6+</div>
+      <div class="stat-label">Production SaaS Apps</div>
+    </div>
+    <div>
+      <div class="stat-num">AI</div>
+      <div class="stat-label">Native Architecture</div>
+    </div>
+    <div>
+      <div class="stat-num">Full</div>
+      <div class="stat-label">Stack End-to-End</div>
+    </div>
+    <div>
+      <div class="stat-num">0→1</div>
+      <div class="stat-label">Idea to Shipped</div>
+    </div>
+  </div>
+</div>
+
+<section id="services" class="container fade-in">
+  <div class="section-tag">What I Build</div>
+  <div class="section-title">Services</div>
+  <div class="section-desc">I don't just write code — I build revenue-generating systems designed to operate autonomously with minimal human intervention.</div>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">⚡</div>
+      <h3>AI-Powered SaaS Applications</h3>
+      <p>Full-stack web applications with AI baked into the core — not bolted on. LLM integrations, intelligent automation, and production-ready architecture from day one.</p>
+      <div class="service-price">Starting at $3,500</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🔄</div>
+      <h3>Workflow Automation Systems</h3>
+      <p>n8n, Make, and custom automation pipelines that replace manual processes. API integrations, data orchestration, and self-healing error handling built in.</p>
+      <div class="service-price">Starting at $2,000</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🚀</div>
+      <h3>MVP & Rapid Prototyping</h3>
+      <p>Go from idea to working product in weeks, not months. I specialize in shipping fast — validated features, clean architecture, ready for users on day one.</p>
+      <div class="service-price">Starting at $2,500</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📊</div>
+      <h3>Web Apps & Dashboards</h3>
+      <p>Beautiful, responsive web applications with real-time data, complex business logic, subscription billing, and user management. Built for scale.</p>
+      <div class="service-price">Starting at $2,000</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🤖</div>
+      <h3>Autonomous Content Pipelines</h3>
+      <p>End-to-end automated content creation systems using AI video generation, text-to-speech, and intelligent publishing workflows. Set it and forget it.</p>
+      <div class="service-price">Starting at $3,000</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🛠️</div>
+      <h3>Technical Architecture & Consulting</h3>
+      <p>System design, API architecture, deployment strategy, and technical roadmapping for founders who need someone who's actually shipped products.</p>
+      <div class="service-price">$150/hr</div>
+    </div>
+  </div>
+</section>
+
+<section id="work" class="container fade-in">
+  <div class="section-tag">Shipped Products</div>
+  <div class="section-title">Selected Work</div>
+  <div class="section-desc">These aren't mockups. These are production systems I designed, built, and shipped — handling real users and real data.</div>
+
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="project-preview"><div class="mesh mesh-1"></div><span class="project-type">SaaS Platform</span></div>
+      <div class="project-body">
+        <h3>SpamPays</h3>
+        <p>TCPA violation enforcement platform with AI-powered investigation capabilities. OCR processing, automated company identification, self-healing investigation logic, and legally-compliant demand letter generation.</p>
+        <div class="project-tags">
+          <span>Next.js</span><span>AI/LLM</span><span>OCR</span><span>Legal Tech</span><span>PostgreSQL</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-preview"><div class="mesh mesh-2"></div><span class="project-type">SaaS Platform</span></div>
+      <div class="project-body">
+        <h3>HiReply</h3>
+        <p>Automated Google Business Profile review response system. Multi-tier subscriptions, intelligent response generation, review recovery bounties, and sophisticated cancellation flows for maximum retention.</p>
+        <div class="project-tags">
+          <span>React</span><span>Node.js</span><span>GBP API</span><span>AI/NLP</span><span>Stripe</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-preview"><div class="mesh mesh-3"></div><span class="project-type">Streaming Platform</span></div>
+      <div class="project-body">
+        <h3>MintCast</h3>
+        <p>Digital signage streaming service evolved into a white-label TV operating system. Syndicate affiliate program with 80% commission structure, Growth Account reinvestment strategies for enterprise clients.</p>
+        <div class="project-tags">
+          <span>Streaming</span><span>White-Label</span><span>Enterprise</span><span>Affiliate System</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-preview"><div class="mesh mesh-4"></div><span class="project-type">Automation Pipeline</span></div>
+      <div class="project-body">
+        <h3>Autonomous Content Pipeline</h3>
+        <p>Fully automated TikTok content creation system using Sora 2, ElevenLabs TTS, and n8n workflows. AI video generation, lip-sync processing, and intelligent publishing — zero human intervention needed.</p>
+        <div class="project-tags">
+          <span>n8n</span><span>Sora 2</span><span>ElevenLabs</span><span>FFmpeg</span><span>Replicate</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-preview"><div class="mesh mesh-5"></div><span class="project-type">Trading System</span></div>
+      <div class="project-body">
+        <h3>Autonomous Trading Program</h3>
+        <p>Algorithmic prop trading system with n8n orchestration. P&L reconciliation, direct API integrations, custom MESA trading indicators, and automated challenge management across multiple accounts.</p>
+        <div class="project-tags">
+          <span>n8n</span><span>Tradovate API</span><span>PostgreSQL</span><span>MESA Indicators</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-preview"><div class="mesh mesh-1"></div><span class="project-type">SaaS Platform</span></div>
+      <div class="project-body">
+        <h3>RevShare</h3>
+        <p>Referral commission tracking and payout platform. Automated commission calculations, multi-tier referral structures, real-time dashboards, and integrated payment processing.</p>
+        <div class="project-tags">
+          <span>Next.js</span><span>Stripe</span><span>Webhooks</span><span>Dashboard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container fade-in">
+  <div class="section-tag">Tech Stack</div>
+  <div class="section-title">Tools I Work With</div>
+  <div class="section-desc">Battle-tested stack, not trendy experiments.</div>
+
+  <div class="tech-grid">
+    <div class="tech-group">
+      <h4>Frontend</h4>
+      <ul>
+        <li>React / Next.js</li>
+        <li>TypeScript</li>
+        <li>Tailwind CSS</li>
+        <li>Responsive Design</li>
+      </ul>
+    </div>
+    <div class="tech-group">
+      <h4>Backend</h4>
+      <ul>
+        <li>Node.js</li>
+        <li>Python</li>
+        <li>PostgreSQL</li>
+        <li>REST & Webhook APIs</li>
+      </ul>
+    </div>
+    <div class="tech-group">
+      <h4>AI / Automation</h4>
+      <ul>
+        <li>OpenAI / Claude API</li>
+        <li>n8n Workflows</li>
+        <li>ElevenLabs / Sora</li>
+        <li>OCR / NLP Pipelines</li>
+      </ul>
+    </div>
+    <div class="tech-group">
+      <h4>Infrastructure</h4>
+      <ul>
+        <li>Vercel / Hetzner</li>
+        <li>Cloudflare</li>
+        <li>Stripe Billing</li>
+        <li>CI/CD Pipelines</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="process" class="container fade-in">
+  <div class="section-tag">How I Work</div>
+  <div class="section-title">From Idea to Shipped</div>
+  <div class="section-desc">Fast, transparent, and built to last.</div>
+
+  <div class="process-steps">
+    <div class="step">
+      <h3>Discovery Call</h3>
+      <p>30-minute call to understand your problem, goals, and timeline. I'll tell you honestly if I'm the right fit — and exactly what it'll take.</p>
+    </div>
+    <div class="step">
+      <h3>Scope & Quote</h3>
+      <p>Within 48 hours you'll have a detailed scope document, timeline, and fixed-price quote. No surprises. No hourly billing anxiety.</p>
+    </div>
+    <div class="step">
+      <h3>Build Sprint</h3>
+      <p>I build fast. Daily or bi-weekly updates with working demos you can click through. You'll see real progress, not slide decks.</p>
+    </div>
+    <div class="step">
+      <h3>Ship & Support</h3>
+      <p>Deployed, tested, and documented. I include 2 weeks of post-launch support to squash any issues and ensure a smooth handoff.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="cta-section">
+  <div class="container" style="position:relative; z-index:1;">
+    <div class="section-tag">Ready to Build?</div>
+    <div class="section-title">Let's turn your idea into<br>a product that works.</div>
+    <div class="section-desc">I take on a limited number of projects to ensure each one gets my full attention. Reach out and let's talk about what you're building.</div>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+      <a href="mailto:arthur@hirearthur.com" class="btn-primary">arthur@hirearthur.com →</a>
+      <a href="#" class="btn-secondary">Schedule a Call</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p style="font-family: 'Space Mono', monospace;">© 2026 HireArthur LLC — Tempe, Arizona</p>
+    <p style="margin-top: 0.5rem;"><a href="/terms.html" style="color: var(--text-dim); text-decoration: none; margin-right: 1.5rem; font-size: 0.75rem;">Terms of Service</a><a href="/privacy.html" style="color: var(--text-dim); text-decoration: none; font-size: 0.75rem;">Privacy Policy</a></p>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.fade-in').forEach(el => el.classList.add('pre-animate'));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
