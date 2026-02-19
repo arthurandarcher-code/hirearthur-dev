@@ -113,7 +113,7 @@
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding-top: 5rem;
+    padding-top: 10rem;
     position: relative;
   }
   .hero-content { max-width: 800px; }
@@ -166,9 +166,10 @@
     opacity: 0;
     animation: fadeUp 0.8s 0.8s forwards;
   }
-  .btn-primary {
+  .btn-primary, [style*="gradient"] {
     background: var(--gradient);
-    color: #000000;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
     padding: 0.85rem 2rem;
     border-radius: 8px;
     font-weight: 600;
@@ -245,6 +246,8 @@
   /* SECTIONS */
   section { padding: 6rem 0; }
   section.container { padding: 4rem 2rem; }
+  #services { padding-top: 2rem; }
+  #work { padding-top: 6rem; }
   .section-tag {
     font-family: 'Space Mono', monospace;
     font-size: 0.75rem;
@@ -548,7 +551,7 @@
       <a href="#services">Services</a>
       <a href="#work">Work</a>
       <a href="#process">Process</a>
-      <a href="https://cal.com/hirearthurdev/strategy-call" class="nav-cta">Let's Talk</a>
+      <a href="#contact" class="nav-cta">Let's Talk</a>
     </div>
   </div>
 </nav>
@@ -784,7 +787,7 @@
     <div class="section-title">Let's turn your idea into<br>a product that works.</div>
     <div class="section-desc">I take on a limited number of projects to ensure each one gets my full attention. Reach out and let's talk about what you're building.</div>
     <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-      <a href="https://cal.com/hirearthurdev/strategy-call" class="btn-primary">Book a Free Strategy Call →</a>
+      <a href="#" class="btn-primary">Schedule a Call →</a>
       <a href="mailto:letsbuild@hirearthur.dev" class="btn-secondary">letsbuild@hirearthur.dev</a>
     </div>
   </div>
